@@ -467,4 +467,6 @@ new Array(COUNT).fill(``).forEach(
     () => render(tasks, creteTaskTemplate())
 );
 
-render(tasks, createBtnTemplate());
+const board = content.querySelector(`.board`);
+
+render(board, createBtnTemplate());
