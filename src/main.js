@@ -29,8 +29,6 @@ render(tasks, createTaskFormTemplate(items[0]));
 let tasksOnPage = ITEMS_PER_PAGE + 1;
 
 render(tasks, items.slice(1, tasksOnPage).map((item) => createTaskTemplate(item)).join(`\n`));
-render(tasks, items.slice(tasksOnPage, 3).map((item) => createTaskTemplate(item)).join(`\n`));
-
 
 const board = content.querySelector(`.board`);
 
