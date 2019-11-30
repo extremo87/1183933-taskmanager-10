@@ -4,8 +4,9 @@ import {createTasksTemplate} from './components/tasks';
 import {createTaskTemplate} from './components/task';
 import {createBtnTemplate} from './components/btnLoad';
 import {createTaskFormTemplate} from './components/form';
-
-const COUNT = 3;
+import {COUNT} from './config';
+import {generateTasks} from './mocks/tasks';
+import {getFilters} from './mocks/filters';
 
 const content = document.querySelector(`.main`);
 
@@ -29,3 +30,9 @@ new Array(COUNT).fill(``).forEach(
 const board = content.querySelector(`.board`);
 
 render(board, createBtnTemplate());
+
+const items = generateTasks(100);
+const filters = getFilters(items);
+
+console.log(filters);
+
