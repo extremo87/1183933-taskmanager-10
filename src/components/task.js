@@ -1,18 +1,24 @@
-export const createTaskTemplate = (task) => {
-  const {description, tags, dueDate} = task;
+import moment from 'moment';
 
-  const renderTag = (tag) => {
-    return (`
+const renderTag = (tag) => {
+  return (`
             <span class="card__hashtag-inner">
             <span class="card__hashtag-name">
                 #${tag}
             </span>
             </span>
         `);
-  };
+};
 
+export const createTaskTemplate = (task) => {
+  const {description, tags, dueDate, color, repeatingDays} = task;
+  const cardDate = dueDate instanceof Date ? moment(dueDate).format(`D MMMM`) : ``;
+  const cardTime = dueDate instanceof Date ? moment(dueDate).format(`h:mm a`) : ``;
+  const isExpired = dueDate instanceof Date && dueDate < Date.now();
+  const deadlineClass = isExpired ? `card--deadline` : ``;
+  const repeatClass = Object.values(repeatingDays).some(Boolean) ? `card--repeat` : ``;
 
-  return (`<article class="card card--black">
+  return (`<article class="card card--${color} ${repeatClass} ${deadlineClass}">
           <div class="card__form">
           <div class="card__inner">
               <div class="card__control">
@@ -45,15 +51,15 @@ export const createTaskTemplate = (task) => {
                   <div class="card__dates">
                   <div class="card__date-deadline">
                       <p class="card__input-deadline-wrap">
-                      <span class="card__date">23 September</span>
-                      <span class="card__time">11:15 PM</span>
+                      <span class="card__date">${cardDate}</span>
+                      <span class="card__time">${cardTime}</span>
                       </p>
                   </div>
                   </div>
   
                   <div class="card__hashtag">
                   <div class="card__hashtag-list">
-                      ${tags.map((tag) => renderTag(tag))}
+                      ${Array.from(tags).map((tag) => renderTag(tag)).join(`\n`)}
                   </div>
                   </div>
               </div>

@@ -8,8 +8,7 @@ import {COUNT} from './config';
 import {generateTasks} from './mocks/tasks';
 import {getFilters} from './mocks/filters';
 
-
-const items = generateTasks(100);
+const items = generateTasks(COUNT);
 const filters = getFilters(items);
 
 const content = document.querySelector(`.main`);
@@ -25,16 +24,14 @@ render(content, createFiltersTemplate(filters));
 render(content, createTasksTemplate());
 
 const tasks = content.querySelector(`.board__tasks`);
-render(tasks, createTaskFormTemplate());
+render(tasks, createTaskFormTemplate(items[0]));
 
-new Array(COUNT).fill(``).forEach(
-    () => render(tasks, createTaskTemplate())
-);
+render(tasks, items.slice(1, items.length).map((item) => createTaskTemplate(item)).join(`\n`));
 
 const board = content.querySelector(`.board`);
 
 render(board, createBtnTemplate());
 
 
-console.log(filters);
+console.log(items, filters);
 

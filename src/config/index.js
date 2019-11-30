@@ -1,2 +1,3 @@
 export const colors = [`black`, `yellow`, `blue`, `green`, `pink`];
-export const COUNT = 3;
+export const week = [`mo`, `tu`, `we`, `th`, `fr`, `sa`, `su`];
+export const COUNT = 20;
