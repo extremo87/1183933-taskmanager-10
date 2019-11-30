@@ -8,6 +8,10 @@ import {COUNT} from './config';
 import {generateTasks} from './mocks/tasks';
 import {getFilters} from './mocks/filters';
 
+
+const items = generateTasks(100);
+const filters = getFilters(items);
+
 const content = document.querySelector(`.main`);
 
 const header = document.querySelector(`.main__control`);
@@ -17,7 +21,7 @@ const render = (container, template, position = `beforeend`) => {
 };
 
 render(header, createMenuTemplate());
-render(content, createFiltersTemplate());
+render(content, createFiltersTemplate(filters));
 render(content, createTasksTemplate());
 
 const tasks = content.querySelector(`.board__tasks`);
@@ -31,8 +35,6 @@ const board = content.querySelector(`.board`);
 
 render(board, createBtnTemplate());
 
-const items = generateTasks(100);
-const filters = getFilters(items);
 
 console.log(filters);
 
