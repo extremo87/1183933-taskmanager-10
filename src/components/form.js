@@ -39,8 +39,6 @@ const renderColor = (color, currentColor) => {
 };
 
 const createRepeatingDaysMarkup = (weekDays, repeatingDays) => {
-
-  console.log(weekDays, repeatingDays);
   return weekDays
     .map((day) => {
       const isChecked = repeatingDays[day];
