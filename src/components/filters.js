@@ -1,3 +1,5 @@
+import Component from './Component';
+
 export const createFiltersTemplate = (filters) => {
 
   const renderFilter = (item, isChecked) => {
@@ -22,3 +24,16 @@ export const createFiltersTemplate = (filters) => {
     </section>
   `);
 };
+
+export default class Filter extends Component {
+  constructor(filters) {
+    super();
+    this._filters = filters;
+  }
+
+  getTemplate() {
+    return createFiltersTemplate(this._filters);
+  }
+
+
+}

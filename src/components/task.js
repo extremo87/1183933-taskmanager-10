@@ -1,5 +1,6 @@
 import moment from 'moment';
 import {isExpired} from '../utils';
+import Component from './Component';
 
 const renderTag = (tag) => {
   return (`
@@ -69,3 +70,14 @@ export const createTaskTemplate = (task) => {
           </div>
       </article>`);
 };
+
+export default class Task extends Component {
+  constructor(task) {
+    super();
+    this._task = task;
+  }
+
+  getTemplate() {
+    return createTaskTemplate(this._task);
+  }
+}

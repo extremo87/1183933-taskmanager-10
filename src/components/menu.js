@@ -1,4 +1,6 @@
-export const createMenuTemplate = () => {
+import Component from './Component';
+
+const createMenuTemplate = () => {
   return (`<section class="control__btn-wrap">
       <input
         type="radio"
@@ -28,3 +30,9 @@ export const createMenuTemplate = () => {
       >
     </section>`);
 };
+
+export default class Menu extends Component {
+  getTemplate() {
+    return createMenuTemplate();
+  }
+}

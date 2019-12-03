@@ -1,5 +1,6 @@
 import moment from 'moment';
 import {colors, week} from '../config';
+import Component from './Component';
 
 const renderTag = (tag) => {
   return (`
@@ -162,3 +163,14 @@ export const createTaskFormTemplate = (task) => {
       </form>
     </article>`);
 };
+
+export default class Form extends Component {
+  constructor(task) {
+    super();
+    this._task = task;
+  }
+
+  getTemplate() {
+    return createTaskFormTemplate(this._task);
+  }
+}
