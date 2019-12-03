@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export const getRandomArrayItem = (array) => {
   const randomIndex = getRandomInt(0, array.length);
   return array[randomIndex];
@@ -18,10 +20,7 @@ export const getRandomDate = () => {
 };
 
 export const isToday = (date) => {
-  const today = new Date();
-  return date.getDate() === today.getDate() &&
-  date.getMonth() === today.getMonth() &&
-  date.getFullYear() === today.getFullYear();
+  return moment().isSame(moment(date), `day`);
 };
 
 export const isExpired = (date) => {
