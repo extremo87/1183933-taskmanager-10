@@ -1,4 +1,5 @@
 import moment from 'moment';
+import {isExpired} from '../utils';
 
 const renderTag = (tag) => {
   return (`
@@ -12,12 +13,10 @@ const renderTag = (tag) => {
 
 export const createTaskTemplate = (task) => {
   const {description, tags, dueDate, color, repeatingDays} = task;
-
   const m = moment(dueDate);
   const cardTime = m.isValid() && m.format(`h:mm a`);
   const cardDate = m.isValid() && m.format(`D MMMM`);
-  const isExpired = dueDate instanceof Date && dueDate < Date.now();
-  const deadlineClass = isExpired ? `card--deadline` : ``;
+  const deadlineClass = isExpired(dueDate) ? `card--deadline` : ``;
   const repeatClass = Object.values(repeatingDays).some(Boolean) ? `card--repeat` : ``;
 
   return (`<article class="card card--${color} ${repeatClass} ${deadlineClass}">

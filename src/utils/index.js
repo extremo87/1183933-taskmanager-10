@@ -24,6 +24,6 @@ export const isToday = (date) => {
 };
 
 export const isExpired = (date) => {
-  return moment().isBefore(moment(date));
+  return moment().isAfter(moment(date));
 };
 
