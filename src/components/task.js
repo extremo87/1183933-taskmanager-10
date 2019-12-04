@@ -1,4 +1,6 @@
 import moment from 'moment';
+import {isExpired} from '../utils';
+import Component from './Component';
 
 const renderTag = (tag) => {
   return (`
@@ -12,10 +14,10 @@ const renderTag = (tag) => {
 
 export const createTaskTemplate = (task) => {
   const {description, tags, dueDate, color, repeatingDays} = task;
-  const cardDate = dueDate instanceof Date ? moment(dueDate).format(`D MMMM`) : ``;
-  const cardTime = dueDate instanceof Date ? moment(dueDate).format(`h:mm a`) : ``;
-  const isExpired = dueDate instanceof Date && dueDate < Date.now();
-  const deadlineClass = isExpired ? `card--deadline` : ``;
+  const m = moment(dueDate);
+  const cardTime = m.isValid() && m.format(`h:mm a`);
+  const cardDate = m.isValid() && m.format(`D MMMM`);
+  const deadlineClass = isExpired(dueDate) ? `card--deadline` : ``;
   const repeatClass = Object.values(repeatingDays).some(Boolean) ? `card--repeat` : ``;
 
   return (`<article class="card card--${color} ${repeatClass} ${deadlineClass}">
@@ -51,8 +53,8 @@ export const createTaskTemplate = (task) => {
                   <div class="card__dates">
                   <div class="card__date-deadline">
                       <p class="card__input-deadline-wrap">
-                      <span class="card__date">${cardDate}</span>
-                      <span class="card__time">${cardTime}</span>
+                      <span class="card__date">${cardDate ? cardDate : ``}</span>
+                      <span class="card__time">${cardTime ? cardTime : ``}</span>
                       </p>
                   </div>
                   </div>
@@ -68,3 +70,14 @@ export const createTaskTemplate = (task) => {
           </div>
       </article>`);
 };
+
+export default class Task extends Component {
+  constructor(task) {
+    super();
+    this._task = task;
+  }
+
+  getTemplate() {
+    return createTaskTemplate(this._task);
+  }
+}

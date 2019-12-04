@@ -1,12 +1,14 @@
-export const createTasksTemplate = () => {
-  return (`<section class="board container">
-      <div class="board__filter-list">
-        <a href="#" class="board__filter">SORT BY DEFAULT</a>
-        <a href="#" class="board__filter">SORT BY DATE up</a>
-        <a href="#" class="board__filter">SORT BY DATE down</a>
-      </div>
-  
-      <div class="board__tasks">
-       </div>
-    </section>`);
+import Component from './Component';
+
+const createTasksTemplate = () => {
+  return (
+    `<div class="board__tasks"></div>`
+  );
 };
+
+export default class Tasks extends Component {
+  getTemplate() {
+    return createTasksTemplate();
+  }
+}
+

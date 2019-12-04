@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export const getRandomArrayItem = (array) => {
   const randomIndex = getRandomInt(0, array.length);
   return array[randomIndex];
@@ -18,14 +20,32 @@ export const getRandomDate = () => {
 };
 
 export const isToday = (date) => {
-  const today = new Date();
-  return date.getDate() === today.getDate() &&
-  date.getMonth() === today.getMonth() &&
-  date.getFullYear() === today.getFullYear();
+  return moment().isSame(moment(date), `day`);
 };
 
 export const isExpired = (date) => {
-  const today = new Date();
-  return date < today;
+  return moment().isAfter(moment(date));
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  return newElement.firstElementChild;
+};
+
+export const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`
+};
+
+export const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
 };
 
