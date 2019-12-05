@@ -9,32 +9,32 @@ import Board from './components/Board';
 import Sort from './components/Sort';
 import Tasks from './components/Tasks';
 import Form from './components/Form';
+import Missing from './components/Missing';
 import {render as domRender, RenderPosition} from './utils';
 
 const items = generateTasks(COUNT);
 const filters = getFilters(items);
+const isEverythingDone = items.every((task) => task.isArchive);
+
 const content = document.querySelector(`.main`);
 const header = document.querySelector(`.main__control`);
-const render = (container, template, position = `beforeend`) => {
-  container.insertAdjacentHTML(position, template);
-};
 
 domRender(header, new Menu().getElement(), RenderPosition.BEFOREEND);
-
 domRender(content, new Filters(filters).getElement(), RenderPosition.BEFOREEND);
 
 const boardComponent = new Board();
 domRender(content, boardComponent.getElement(), RenderPosition.BEFOREEND);
-domRender(boardComponent.getElement(), new Sort().getElement(), RenderPosition.BEFOREEND);
-domRender(boardComponent.getElement(), new Tasks().getElement(), RenderPosition.BEFOREEND);
+
+if (!isEverythingDone) {
+  domRender(boardComponent.getElement(), new Sort().getElement(), RenderPosition.BEFOREEND);
+  domRender(boardComponent.getElement(), new Tasks().getElement(), RenderPosition.BEFOREEND);
+}
 
 const taskListElement = boardComponent.getElement().querySelector(`.board__tasks`);
 
 const renderTask = (list, task) => {
-
   const onEscKeyDown = (evt) => {
     const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
-
     if (isEscKey) {
       replaceWithTask();
       document.removeEventListener(`keydown`, onEscKeyDown);
@@ -60,24 +60,29 @@ const renderTask = (list, task) => {
   domRender(list, taskComponent.getElement(), RenderPosition.BEFOREEND);
 };
 
-let tasksOnPage = ITEMS_PER_PAGE;
+if (isEverythingDone) {
+  domRender(boardComponent.getElement(), new Missing().getElement(), RenderPosition.AFTERNODE);
+} else {
+  let tasksOnPage = ITEMS_PER_PAGE;
 
-items.slice(0, tasksOnPage)
-    .forEach((task) => {
-      renderTask(taskListElement, task);
-});
+  items.slice(0, tasksOnPage)
+      .forEach((task) => {
+        renderTask(taskListElement, task);
+      });
 
-const btnLoad = new Button();
+  const btnLoad = new Button();
 
-domRender(boardComponent.getElement(), btnLoad.getElement(), RenderPosition.BEFOREEND);
+  domRender(boardComponent.getElement(), btnLoad.getElement(), RenderPosition.BEFOREEND);
 
-btnLoad.getElement().addEventListener(`click`, () => {
-  const prevTasksOnPage = tasksOnPage;
-  tasksOnPage += ITEMS_PER_PAGE;
-  items.slice(prevTasksOnPage, tasksOnPage).map((item) => renderTask(taskListElement, item)).join(`\n`);
+  btnLoad.getElement().addEventListener(`click`, () => {
+    const prevTasksOnPage = tasksOnPage;
+    tasksOnPage += ITEMS_PER_PAGE;
+    items.slice(prevTasksOnPage, tasksOnPage).map((item) => renderTask(taskListElement, item)).join(`\n`);
 
-  if (tasksOnPage > items.length) {
-    btnLoad.removeElement();
-  }
-});
+    if (tasksOnPage > items.length) {
+      btnLoad.removeElement();
+    }
+  });
+}
+
 
