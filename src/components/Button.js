@@ -8,5 +8,9 @@ export default class Button extends Component {
   getTemplate() {
     return createBtnTemplate();
   }
+
+  setClickhandler(handler) {
+    this.getElement().addEventListener(`click`, handler);
+  }
 }
 

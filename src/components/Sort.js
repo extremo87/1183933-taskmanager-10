@@ -16,3 +16,4 @@ export default class Sort extends Component {
     return createSortTemplate();
   }
 }
+
