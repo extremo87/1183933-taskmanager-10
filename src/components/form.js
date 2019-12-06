@@ -173,4 +173,8 @@ export default class Form extends Component {
   getTemplate() {
     return createTaskFormTemplate(this._task);
   }
+
+  setSubmitButtonHandler(handler) {
+    this.getElement().querySelector(`.card__save`).addEventListener(`click`, handler);
+  }
 }
