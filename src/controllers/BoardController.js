@@ -51,7 +51,6 @@ export default class BoardController {
         renderTask(position, task);
       });
     };
-    
     const renderButton = () => {
       if (tasksOnPage > items.length) {
         return;
