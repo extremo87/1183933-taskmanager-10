@@ -1,11 +1,10 @@
 import Tasks from '../components/tasks';
 import Sort from '../components/Sort';
 import Button from '../components/Button';
-import Form from '../components/Form';
 import Missing from '../components/Missing';
 import {ITEMS_PER_PAGE} from '../config';
-import Task from '../components/Тask';
 import {render as domRender, RenderPosition} from '../utils';
+import TaskController from './TaskController';
 
 export default class BoardController {
 
@@ -20,37 +19,14 @@ export default class BoardController {
   render(items) {
     const isEverythingDone = items.every((task) => task.isArchive);
 
-    const renderTask = (list, task) => {
-      const onEscKeyDown = (evt) => {
-        const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
-        if (isEscKey) {
-          replaceWithTask();
-          document.removeEventListener(`keydown`, onEscKeyDown);
-        }
-      };
-
-      const taskComponent = new Task(task);
-      const formComponent = new Form(task);
-
-      taskComponent.setEditButtonClickHandler(() => {
-        taskComponent.getElement().replaceWith(formComponent.getElement());
-        document.addEventListener(`keydown`, onEscKeyDown);
-      });
-
-      const replaceWithTask = () => {
-        formComponent.getElement().replaceWith(taskComponent.getElement());
-      };
-
-      formComponent.setSubmitButtonHandler(replaceWithTask);
-
-      domRender(list, taskComponent.getElement(), RenderPosition.BEFOREEND);
-    };
-
     const renderTasks = (position, tasks) => {
       tasks.forEach((task) => {
-        renderTask(position, task);
+
+        const taskController = new TaskController(position);
+        taskController.render(task);
       });
     };
+    
     const renderButton = () => {
       if (tasksOnPage > items.length) {
         return;
@@ -67,7 +43,6 @@ export default class BoardController {
         }
       });
     };
-
 
     if (!isEverythingDone) {
       domRender(this._component.getElement(), this._sortComponent.getElement(), RenderPosition.BEFOREEND);
