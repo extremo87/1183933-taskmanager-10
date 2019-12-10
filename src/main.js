@@ -1,4 +1,4 @@
-import Menu from './components/Menu';
+import Menu from './components/Мenu';
 import Filters from './components/Filters';
 import {COUNT} from './config';
 import {generateTasks} from './mocks/tasks';
