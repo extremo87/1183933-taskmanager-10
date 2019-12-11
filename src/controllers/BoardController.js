@@ -5,16 +5,19 @@ import Missing from '../components/Missing';
 import {ITEMS_PER_PAGE} from '../config';
 import {render as domRender, RenderPosition} from '../utils';
 import TaskController from './TaskController';
+import Filters from '../components/Filters';
+import {getFilters} from '../mocks/filters';
 
 export default class BoardController {
 
-  constructor(component) {
+  constructor(component, filters) {
     this._tasks = [];
     this._component = component;
     this._sortComponent = new Sort();
     this._btnLoad = new Button();
     this._tasksContainer = new Tasks();
     this._missing = new Missing();
+    this._filters = filters;
 
     // binding context
     this._onDataChange = this._onDataChange.bind(this);
@@ -97,9 +100,17 @@ export default class BoardController {
 
     if (index === -1) {
       return;
-    } 
+    }
     this._tasks[index] = newObject;
     controller.render(newObject);
+    this.updateFilters(this._tasks);
+  }
+
+  updateFilters(tasks) {
+    const oldFilters = this._filters.getElement();
+    this._filters = new Filters(getFilters(tasks));
+    oldFilters.replaceWith(this._filters.getElement());
   }
 
 }
+

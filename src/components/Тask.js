@@ -92,7 +92,7 @@ export default class Task extends Component {
   }
 
   setArchiveButtonClickHandler(handler) {
-    this.getElement().querySelector(`.card__btn--favorites`)
+    this.getElement().querySelector(`.card__btn--archive`)
       .addEventListener(`click`, handler);
   }
 

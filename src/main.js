@@ -14,9 +14,12 @@ const content = document.querySelector(`.main`);
 const header = document.querySelector(`.main__control`);
 
 domRender(header, new Menu().getElement(), RenderPosition.BEFOREEND);
-domRender(content, new Filters(filters).getElement(), RenderPosition.BEFOREEND);
+
+const filtersComponent = new Filters(filters);
+
+domRender(content, filtersComponent.getElement(), RenderPosition.BEFOREEND);
 
 const boardComponent = new Board();
 domRender(content, boardComponent.getElement(), RenderPosition.BEFOREEND);
 
-new BoardController(boardComponent).render(items);
+new BoardController(boardComponent, filtersComponent).render(items);

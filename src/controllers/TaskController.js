@@ -32,6 +32,8 @@ export default class TaskController {
     });
 
     this._taskComponent.setFavouriteButtonClickHandler(() => this._onDataChange(this, task, Object.assign({}, task, {isFavorite: !task.isFavorite})));
+    this._taskComponent.setArchiveButtonClickHandler(() => this._onDataChange(this, task, Object.assign({}, task, {isArchive: !task.isArchive})));
+
 
     const replaceWithTask = () => {
       this._formComponent.getElement().replaceWith(this._taskComponent.getElement());
@@ -46,6 +48,6 @@ export default class TaskController {
       domRender(this._container, this._taskComponent.getElement(), RenderPosition.BEFOREEND);
     }
 
-    
+
   }
 }
