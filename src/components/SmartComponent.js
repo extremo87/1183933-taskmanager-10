@@ -1,16 +1,18 @@
 import {Component} from "./Component";
 
 export default class SmartComponent extends Component {
-  constructor() {
-    super();
 
-    if (new.target === SmartComponent) {
-      throw new Error(`Can't instantiate SmartComponent, only concrete one.`);
-    }
+  recoveryListeners() {
+    throw new Error(`You should to implement recoveryListeners in child class.`);
   }
 
   rerender() {
-    return;
+    const oldElement = this.getElement();
+    const parentElement = oldElement.parentElement;
+    this.removeElement();
+    const newElement = this.getElement();
+    parentElement.replaceChild(oldElement, newElement);
+    this.recoveryListeners();
   }
 
 
