@@ -1,10 +1,14 @@
 import Task from "../components/Тask";
 import Form from "../components/Form";
-import {render as domRender, RenderPosition} from "../utils";
+import {render as domRender, RenderPosition, replace} from "../utils";
 
 export default class TaskController {
-  constructor(container) {
+  constructor(container, onDataChange) {
     this._container = container;
+    this._onDataChange = onDataChange;
+
+    this._taskComponent = null;
+    this._formComponent = null;
   }
 
   render(task) {
@@ -16,20 +20,32 @@ export default class TaskController {
       }
     };
 
-    const taskComponent = new Task(task);
-    const formComponent = new Form(task);
+    const oldTaskComponent = this._taskComponent;
+    const oldFormComponent = this._formComponent;
 
-    taskComponent.setEditButtonClickHandler(() => {
-      taskComponent.getElement().replaceWith(formComponent.getElement());
+    this._taskComponent = new Task(task);
+    this._formComponent = new Form(task);
+
+    this._taskComponent.setEditButtonClickHandler(() => {
+      this._taskComponent.getElement().replaceWith(this._formComponent.getElement());
       document.addEventListener(`keydown`, onEscKeyDown);
     });
 
+    this._taskComponent.setFavouriteButtonClickHandler(() => this._onDataChange(this, task, Object.assign({}, task, {isFavorite: !task.isFavorite})));
+
     const replaceWithTask = () => {
-      formComponent.getElement().replaceWith(taskComponent.getElement());
+      this._formComponent.getElement().replaceWith(this._taskComponent.getElement());
     };
 
-    formComponent.setSubmitButtonHandler(replaceWithTask);
+    this._formComponent.setSubmitButtonHandler(replaceWithTask);
 
-    domRender(this._container, taskComponent.getElement(), RenderPosition.BEFOREEND);
+    if (oldTaskComponent && oldFormComponent) {
+      replace(this._taskComponent, oldTaskComponent);
+      replace(this._formComponent, oldFormComponent);
+    } else {
+      domRender(this._container, this._taskComponent.getElement(), RenderPosition.BEFOREEND);
+    }
+
+    
   }
 }
