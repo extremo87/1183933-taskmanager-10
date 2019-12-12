@@ -21,10 +21,10 @@ export default class Component {
 
   removeElement() {
     this._element = null;
-    
   }
-   
+
   removeFromDOM() {
     this._element.remove();
   }
 }
+
