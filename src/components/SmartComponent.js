@@ -1,4 +1,4 @@
-import {Component} from "./Component";
+import Component from "./Component";
 
 export default class SmartComponent extends Component {
 
@@ -8,10 +8,14 @@ export default class SmartComponent extends Component {
 
   rerender() {
     const oldElement = this.getElement();
-    const parentElement = oldElement.parentElement;
+    const parent = oldElement.parentElement;
+
     this.removeElement();
+
     const newElement = this.getElement();
-    parentElement.replaceChild(oldElement, newElement);
+
+    parent.replaceChild(newElement, oldElement);
+
     this.recoveryListeners();
   }
 

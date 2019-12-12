@@ -6,7 +6,6 @@ export default class TaskController {
   constructor(container, onDataChange) {
     this._container = container;
     this._onDataChange = onDataChange;
-
     this._taskComponent = null;
     this._formComponent = null;
   }
@@ -20,8 +19,8 @@ export default class TaskController {
       }
     };
 
-    const oldTaskComponent = this._taskComponent;
-    const oldFormComponent = this._formComponent;
+    let oldTaskComponent = this._taskComponent;
+    let oldFormComponent = this._formComponent;
 
     this._taskComponent = new Task(task);
     this._formComponent = new Form(task);
@@ -33,13 +32,14 @@ export default class TaskController {
 
     this._taskComponent.setFavouriteButtonClickHandler(() => this._onDataChange(this, task, Object.assign({}, task, {isFavorite: !task.isFavorite})));
     this._taskComponent.setArchiveButtonClickHandler(() => this._onDataChange(this, task, Object.assign({}, task, {isArchive: !task.isArchive})));
-
+    this._formComponent.setSubmitButtonHandler(() => {
+      this._onDataChange(this, task, Object.assign({}, task, this._formComponent.getState()));
+      replaceWithTask();
+    });
 
     const replaceWithTask = () => {
       this._formComponent.getElement().replaceWith(this._taskComponent.getElement());
     };
-
-    this._formComponent.setSubmitButtonHandler(replaceWithTask);
 
     if (oldTaskComponent && oldFormComponent) {
       replace(this._taskComponent, oldTaskComponent);
@@ -47,7 +47,5 @@ export default class TaskController {
     } else {
       domRender(this._container, this._taskComponent.getElement(), RenderPosition.BEFOREEND);
     }
-
-
   }
 }

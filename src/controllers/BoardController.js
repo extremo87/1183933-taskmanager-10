@@ -49,7 +49,7 @@ export default class BoardController {
         renderTasks(taskListElement, items.slice(prevTasksOnPage, tasksOnPage));
 
         if (tasksOnPage > items.length) {
-          this._btnLoad.removeElement();
+          this._btnLoad.removeFromDOM();
         }
       });
     };
@@ -90,17 +90,19 @@ export default class BoardController {
       if (sortOrder === sortTypes().DEFAULT) {
         renderButton();
       } else {
-        this._btnLoad.removeElement();
+        this._btnLoad.removeFromDOM();
       }
     });
 
   }
   _onDataChange(controller, oldObject, newObject) {
+
     const index = this._tasks.findIndex((object) => object === oldObject);
 
     if (index === -1) {
       return;
     }
+       
     this._tasks[index] = newObject;
     controller.render(newObject);
     this.updateFilters(this._tasks);
