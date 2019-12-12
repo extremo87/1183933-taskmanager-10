@@ -69,6 +69,17 @@ export const createTaskFormTemplate = (task, options = {}) => {
   const deadlineClass = isExpired ? `card--deadline` : ``;
   const repeatingDaysMarkup = createRepeatingDaysMarkup(week, repeatingDays);
 
+  const validate = () => {
+    if (isRepeated && !Object.values(repeatingDays).some(Boolean)) {
+      return false;
+    }
+    return true;
+
+    // TODO: date validation
+
+  };
+
+
   return (`
       <article class="card card--edit card--${color} ${repeatClass} ${deadlineClass}">
       <form class="card__form" method="get">
@@ -156,7 +167,7 @@ export const createTaskFormTemplate = (task, options = {}) => {
           </div>
   
           <div class="card__status-btns">
-            <button class="card__save" type="submit">save</button>
+            <button class="card__save" type="submit" ${(validate()) ? `` : `disabled`}>save</button>
             <button class="card__delete" type="button">delete</button>
           </div>
         </div>
@@ -169,7 +180,7 @@ export default class Form extends SmartComponent {
     super();
     this._task = task;
     this._isDateShowing = !!task.dueDate;
-    this._isRepeated = Object.values(task.repeatingDays).some(Boolean);
+    this._isRepeated = Object.values(task.repeatingDays).some(Boolean) && task.isRepeated;
     this._activeRepeatingDays = Object.assign({}, task.repeatingDays);
     this._formHandler = null;
     this.recoveryListeners();
@@ -191,8 +202,18 @@ export default class Form extends SmartComponent {
   getState() {
     return {
       isRepeated: this._isRepeated,
-      repeatDays: this._activeRepeatingDays
+      repeatingDays: this._activeRepeatingDays
     };
+  }
+
+  reset() {
+    const task = this._task;
+
+    this._isDateShowing = !!task.dueDate;
+    this.isRepeated = Object.values(task.repeatingDays).some(Boolean);
+    this._activeRepeatingDays = Object.assign({}, task.repeatingDays);
+
+    this.rerender();
   }
 
   recoveryListeners() {

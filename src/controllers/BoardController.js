@@ -18,24 +18,26 @@ export default class BoardController {
     this._tasksContainer = new Tasks();
     this._missing = new Missing();
     this._filters = filters;
+    this._renderedControllers = [];
 
     // binding context
     this._onDataChange = this._onDataChange.bind(this);
+    this._onViewChange = this._onViewChange.bind(this);
   }
 
   render(items) {
 
     this._tasks = items;
-
     const isEverythingDone = this._tasks.every((task) => task.isArchive);
 
     const renderTasks = (position, tasks) => {
-      tasks.forEach((task) => {
-
-        const taskController = new TaskController(position, this._onDataChange);
+      return tasks.map((task) => {
+        const taskController = new TaskController(position, this._onDataChange, this._onViewChange);
         taskController.render(task);
+        return taskController;
       });
     };
+
 
     const renderButton = () => {
       if (tasksOnPage > this._tasks.length) {
@@ -46,7 +48,8 @@ export default class BoardController {
       this._btnLoad.setClickhandler(() => {
         const prevTasksOnPage = tasksOnPage;
         tasksOnPage += ITEMS_PER_PAGE;
-        renderTasks(taskListElement, items.slice(prevTasksOnPage, tasksOnPage));
+        const renderedTasks = renderTasks(taskListElement, items.slice(prevTasksOnPage, tasksOnPage));
+        this._renderedControllers = this._renderedControllers.concat(renderedTasks);
 
         if (tasksOnPage > items.length) {
           this._btnLoad.removeFromDOM();
@@ -65,7 +68,8 @@ export default class BoardController {
     const taskListElement = this._component.getElement().querySelector(`.board__tasks`);
 
     let tasksOnPage = ITEMS_PER_PAGE;
-    renderTasks(taskListElement, this._tasks.slice(0, tasksOnPage));
+    this._renderedControllers = renderTasks(taskListElement, this._tasks.slice(0, tasksOnPage));
+
     renderButton();
 
     this._sortComponent.setOnClickHandler((sortOrder) => {
@@ -85,7 +89,7 @@ export default class BoardController {
 
       taskListElement.innerHTML = ``;
 
-      renderTasks(taskListElement, tasks);
+      this._renderedControllers = renderTasks(taskListElement, tasks);
 
       if (sortOrder === sortTypes().DEFAULT) {
         renderButton();
@@ -102,10 +106,13 @@ export default class BoardController {
     if (index === -1) {
       return;
     }
-       
     this._tasks[index] = newObject;
     controller.render(newObject);
     this.updateFilters(this._tasks);
+  }
+
+  _onViewChange() {
+    this._renderedControllers.forEach((controller) => controller.setDefaultView());
   }
 
   updateFilters(tasks) {
