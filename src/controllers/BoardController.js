@@ -38,7 +38,6 @@ export default class BoardController {
       });
     };
 
-
     const renderButton = () => {
       if (tasksOnPage > this._tasks.length) {
         return;
@@ -100,6 +99,8 @@ export default class BoardController {
 
   }
   _onDataChange(controller, oldObject, newObject) {
+
+    console.log(oldObject, newObject);
 
     const index = this._tasks.findIndex((object) => object === oldObject);
 

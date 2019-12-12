@@ -1,6 +1,8 @@
 import moment from 'moment';
 import {colors, week} from '../config';
 import SmartComponent from './SmartComponent';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/themes/light.css';
 
 const renderTag = (tag) => {
   return (`
@@ -61,8 +63,8 @@ const createRepeatingDaysMarkup = (weekDays, repeatingDays) => {
 };
 
 export const createTaskFormTemplate = (task, options = {}) => {
-  const {tags, description, color, dueDate} = task;
-  const {isDateShowing, isRepeated, repeatingDays} = options;
+  const {tags, description, color} = task;
+  const {isDateShowing, isRepeated, repeatingDays, dueDate} = options;
   const date = dueDate instanceof Date ? moment(dueDate).format(`D MMMM h:mm a`) : false;
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
   const repeatClass = isRepeated ? `card--repeat` : ``;
@@ -182,15 +184,19 @@ export default class Form extends SmartComponent {
     this._isDateShowing = !!task.dueDate;
     this._isRepeated = Object.values(task.repeatingDays).some(Boolean) && task.isRepeated;
     this._activeRepeatingDays = Object.assign({}, task.repeatingDays);
+    this._dueDate = task.dueDate;
     this._formHandler = null;
+    this._flatpickr = null;
     this.recoveryListeners();
+    this._applyFlatpickr();
   }
 
   getTemplate() {
     return createTaskFormTemplate(this._task, {
       isDateShowing: this._isDateShowing,
       isRepeated: this._isRepeated,
-      repeatingDays: this._activeRepeatingDays
+      repeatingDays: this._activeRepeatingDays,
+      dueDate: this._dueDate
     });
   }
 
@@ -199,11 +205,10 @@ export default class Form extends SmartComponent {
     this.getElement().querySelector(`.card__save`).addEventListener(`click`, handler);
   }
 
-  getState() {
-    return {
-      isRepeated: this._isRepeated,
-      repeatingDays: this._activeRepeatingDays
-    };
+
+  rerender() {
+    super.rerender();
+    this._applyFlatpickr();
   }
 
   reset() {
@@ -216,15 +221,43 @@ export default class Form extends SmartComponent {
     this.rerender();
   }
 
+  _applyFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    if (this._isDateShowing) {
+      const dateElement = this.getElement().querySelector(`.card__date`);
+      this._flatpickr = flatpickr(dateElement, {
+        altInput: true,
+        allowInput: true,
+        defaultDate: this._dueDate,
+        enableTime: true,
+        // eslint-disable-next-line camelcase
+        time_24hr: true,
+      });
+    }
+  }
+
   recoveryListeners() {
     const element = this.getElement();
 
     element.querySelector(`.card__save`).addEventListener(`click`, this._formHandler);
 
+    const dateElement = element.querySelector(`.card__date`);
+    if (dateElement) {
+      dateElement.addEventListener(`change`, (evt) => {
+        this._dueDate = evt.target.value;
+        this.rerender();
+      });
+    }
+
+
     element.querySelector(`.card__date-deadline-toggle`)
       .addEventListener(`click`, () => {
         this._isDateShowing = !this._isDateShowing;
-        this.rerender();
+        this._applyFlatpickr();
       });
 
     element.querySelector(`.card__repeat-toggle`)
@@ -240,6 +273,14 @@ export default class Form extends SmartComponent {
         this.rerender();
       });
     }
+  }
+
+  getState() {
+    return {
+      isRepeated: this._isRepeated,
+      repeatingDays: this._activeRepeatingDays,
+      dueDate: this._dueDate
+    };
   }
 
 }
