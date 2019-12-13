@@ -1,6 +1,6 @@
 import moment from 'moment';
 import {isExpired} from '../utils';
-import Component from './Component';
+import SmartComponent from './SmartComponent';
 
 const renderTag = (tag) => {
   return (`
@@ -27,12 +27,12 @@ export const createTaskTemplate = (task) => {
               <button type="button" class="card__btn card__btn--edit">
                   edit
               </button>
-              <button type="button" class="card__btn card__btn--archive">
+              <button type="button" class="card__btn card__btn--archive ${!task.isArchive ? `card__btn--disabled` : ``}">
                   archive
               </button>
               <button
                   type="button"
-                  class="card__btn card__btn--favorites card__btn--disabled"
+                  class="card__btn card__btn--favorites ${!task.isFavorite ? `card__btn--disabled` : ``}"
               >
                   favorites
               </button>
@@ -71,10 +71,14 @@ export const createTaskTemplate = (task) => {
       </article>`);
 };
 
-export default class Task extends Component {
+export default class Task extends SmartComponent {
   constructor(task) {
     super();
     this._task = task;
+    this._setEditButtonClickHandler = null;
+    this._setFavouriteButtonClickHandler = null;
+    this._setArchiveButtonClickHandler = null;
+
   }
 
   getTemplate() {
@@ -82,8 +86,33 @@ export default class Task extends Component {
   }
 
   setEditButtonClickHandler(handler) {
+    this._setEditButtonClickHandler = handler;
     this.getElement().querySelector(`.card__btn--edit`)
       .addEventListener(`click`, handler);
+  }
+
+  setFavouriteButtonClickHandler(handler) {
+    this._setFavouriteButtonClickHandler = handler;
+    this.getElement().querySelector(`.card__btn--favorites`)
+      .addEventListener(`click`, handler);
+  }
+
+  setArchiveButtonClickHandler(handler) {
+    this._setArchiveButtonClickHandler = handler;
+    this.getElement().querySelector(`.card__btn--archive`)
+      .addEventListener(`click`, handler);
+  }
+
+  recoveryListeners() {
+    const element = this.getElement();
+    element.querySelector(`.card__btn--favorites`)
+      .addEventListener(`click`, this._setFavouriteButtonClickHandler);
+
+    element.querySelector(`.card__btn--archive`)
+      .addEventListener(`click`, this._setArchiveButtonClickHandler);
+
+    element.querySelector(`.card__btn--edit`)
+      .addEventListener(`click`, this._setEditButtonClickHandler);
   }
 
 }
