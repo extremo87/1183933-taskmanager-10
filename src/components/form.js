@@ -257,7 +257,7 @@ export default class Form extends SmartComponent {
     element.querySelector(`.card__date-deadline-toggle`)
       .addEventListener(`click`, () => {
         this._isDateShowing = !this._isDateShowing;
-        this._applyFlatpickr();
+        this.rerender();
       });
 
     element.querySelector(`.card__repeat-toggle`)
