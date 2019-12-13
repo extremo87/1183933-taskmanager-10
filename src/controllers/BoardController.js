@@ -38,7 +38,6 @@ export default class BoardController {
       });
     };
 
-
     const renderButton = () => {
       if (tasksOnPage > this._tasks.length) {
         return;
