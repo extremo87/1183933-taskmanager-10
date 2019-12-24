@@ -1,4 +1,4 @@
-import Menu from './components/Menu';
+import Menu, {MenuItem} from './components/Menu';
 import Filters from './components/Filters';
 import {generateTasks} from './mocks/tasks';
 import {getFilters} from './mocks/filters';
@@ -18,8 +18,10 @@ const filters = getFilters(items);
 
 const content = document.querySelector(`.main`);
 const header = document.querySelector(`.main__control`);
+const siteMenuComponent = new Menu();
 
-domRender(header, new Menu().getElement(), RenderPosition.BEFOREEND);
+domRender(header, siteMenuComponent.getElement(), RenderPosition.BEFOREEND);
+
 
 const filterController = new FilterController(content, model);
 filterController.render();
@@ -27,4 +29,22 @@ filterController.render();
 const boardComponent = new Board();
 domRender(content, boardComponent.getElement(), RenderPosition.BEFOREEND);
 
-new BoardController(boardComponent, model).render(items);
+const board = new BoardController(boardComponent, model);
+
+board.render();
+
+siteMenuComponent.setOnChange((menuItem) => {
+  switch (menuItem) {
+    case MenuItem.NEW_TASK:
+      siteMenuComponent.setActiveItem(MenuItem.TASKS);
+      board.show();
+      board.createTask();
+      break;
+    case MenuItem.STATISTICS:
+      board.hide();
+      break;
+    case MenuItem.TASKS:
+      board.show();
+      break;
+  }
+});

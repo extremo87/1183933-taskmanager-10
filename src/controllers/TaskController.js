@@ -3,7 +3,8 @@ import Form from "../components/Form";
 import {render as domRender, RenderPosition, replace, remove} from "../utils";
 import {COLOR} from '../config/const';
 
-const Mode = {
+export const Mode = {
+  ADD: `add`,
   DEFAULT: `default`,
   EDIT: `edit`,
 };
@@ -71,10 +72,11 @@ export default class TaskController {
     }
   }
 
-  render(task) {
+  render(task, mode) {
 
     const oldTaskComponent = this._taskComponent;
     const oldFormComponent = this._formComponent;
+    this._mode = mode;
 
     this._taskComponent = new Task(task);
     this._formComponent = new Form(task);
@@ -87,16 +89,34 @@ export default class TaskController {
 
     this._taskComponent.setFavouriteButtonClickHandler(() => this._onDataChange(this, task, Object.assign({}, task, {isFavorite: !task.isFavorite})));
     this._taskComponent.setArchiveButtonClickHandler(() => this._onDataChange(this, task, Object.assign({}, task, {isArchive: !task.isArchive})));
-    this._formComponent.setSubmitButtonHandler(() => {
-      this._onDataChange(this, task, Object.assign({}, task, this._formComponent.getState()));
+    this._formComponent.setSubmitButtonHandler((evt) => {
+      evt.preventDefault();
+      const data = this._formComponent.getData();
+      this._onDataChange(this, task, data);
       this.replaceWithTask();
     });
 
-    if (oldTaskComponent && oldFormComponent) {
-      replace(this._taskComponent, oldTaskComponent);
-      replace(this._formComponent, oldFormComponent);
-    } else {
-      domRender(this._container, this._taskComponent.getElement(), RenderPosition.BEFOREEND);
+    this._formComponent.setDeleteButtonHandler(() => this._onDataChange(this, task, null));
+
+    switch (mode) {
+      case Mode.DEFAULT:
+        if (oldTaskComponent && oldFormComponent) {
+          replace(this._taskComponent, oldTaskComponent);
+          replace(this._formComponent, oldFormComponent);
+        } else {
+          domRender(this._container, this._taskComponent.getElement(), RenderPosition.BEFOREEND);
+        }
+        break;
+      case Mode.ADD:
+        if (oldFormComponent && oldTaskComponent) {
+          remove(oldTaskComponent);
+          remove(oldFormComponent);
+        }
+        document.addEventListener(`keydown`, this._onEscKeyDown);
+        domRender(this._container, this._formComponent.getElement(), RenderPosition.AFTERBEGIN);
+        break;
     }
+
+
   }
 }

@@ -3,6 +3,26 @@ import {colors, week} from '../config';
 import SmartComponent from './SmartComponent';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/themes/light.css';
+import {DAYS} from '../config/const';
+
+const parseFormData = (formData) => {
+  const repeatingDays = DAYS.reduce((acc, day) => {
+    acc[day] = false;
+    return acc;
+  }, {});
+  const date = formData.get(`date`);
+
+  return {
+    description: formData.get(`text`),
+    color: formData.get(`color`),
+    tags: formData.getAll(`hashtag`),
+    dueDate: date ? moment(date) : null,
+    repeatingDays: formData.getAll(`repeat`).reduce((acc, it) => {
+      acc[it] = true;
+      return acc;
+    }, repeatingDays),
+  };
+};
 
 const renderTag = (tag) => {
   return (`
@@ -186,6 +206,7 @@ export default class Form extends SmartComponent {
     this._activeRepeatingDays = Object.assign({}, task.repeatingDays);
     this._dueDate = task.dueDate;
     this._formHandler = null;
+    this._deleteButtonHandler = null;
     this._flatpickr = null;
     this.recoveryListeners();
     this._applyFlatpickr();
@@ -205,11 +226,24 @@ export default class Form extends SmartComponent {
     this.getElement().querySelector(`.card__save`).addEventListener(`click`, handler);
   }
 
+  setDeleteButtonHandler(handler) {
+    this._deleteButtonHandler = handler;
+    this.getElement().querySelector(`.card__delete`).addEventListener(`click`, handler);
+  }
 
   rerender() {
     super.rerender();
     this._applyFlatpickr();
   }
+
+  getData() {
+    const form = this.getElement().querySelector(`.card__form`);
+    const formData = new FormData(form);
+
+    return parseFormData(formData);
+  }
+
+
 
   reset() {
     const task = this._task;
@@ -252,7 +286,6 @@ export default class Form extends SmartComponent {
         this.rerender();
       });
     }
-
 
     element.querySelector(`.card__date-deadline-toggle`)
       .addEventListener(`click`, () => {

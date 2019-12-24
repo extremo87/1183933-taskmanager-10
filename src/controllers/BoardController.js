@@ -4,7 +4,7 @@ import Button from '../components/Button';
 import Missing from '../components/Missing';
 import {ITEMS_PER_PAGE} from '../config';
 import {render as domRender, RenderPosition, remove} from '../utils';
-import TaskController from './TaskController';
+import TaskController, {Mode as TaskControllerMode, EmptyTask} from './TaskController';
 
 
 export default class BoardController {
@@ -19,6 +19,7 @@ export default class BoardController {
     this._renderedControllers = [];
     this._taskModel = taskModel;
     this._showingTasksCount = ITEMS_PER_PAGE;
+    this._createForm = null;
 
     // binding context
     this._onDataChange = this._onDataChange.bind(this);
@@ -31,11 +32,21 @@ export default class BoardController {
     this._taskModel.setFilterChangeHandler(this._onFilterChange);
   }
 
+  createTask() {
+    if (this._createForm) {
+      return;
+    }
+
+    const taskListElement = this._tasksContainer.getElement();
+    this._createForm = new TaskController(taskListElement, this._onDataChange, this._onViewChange);
+    this._createForm.render(EmptyTask, TaskControllerMode.ADD);
+  }
+
 
   _renderTasks(position, tasks) {
     return tasks.map((task) => {
       const taskController = new TaskController(position, this._onDataChange, this._onViewChange);
-      taskController.render(task);
+      taskController.render(task, TaskControllerMode.DEFAULT);
       return taskController;
     });
   }
@@ -95,7 +106,7 @@ export default class BoardController {
   }
 
 
-  _renderLoadMoreButton() {  
+  _renderLoadMoreButton() {
     remove(this._btnLoad);
 
     if (this._showingTasksCount >= this._taskModel.getTasks().length) {
@@ -123,12 +134,12 @@ export default class BoardController {
 
     if (newObject === null) {
       this._taskModel.removeTask(oldObject.id);
-      this._updateTasks(8);
+      this._updateTasks(this._showingTasksCount);
     } else {
       const isSuccess = this._taskModel.updateTask(oldObject.id, newObject);
 
       if (isSuccess) {
-        controller.render(newObject);
+        controller.render(newObject, TaskControllerMode.DEFAULT);
       }
     }
   }
@@ -150,6 +161,14 @@ export default class BoardController {
 
   _onFilterChange() {
     this._updateTasks(ITEMS_PER_PAGE);
+  }
+
+  hide() {
+    this._component.hide();
+  }
+
+  show() {
+    this._component.show();
   }
 
 }
