@@ -5,20 +5,17 @@ import Missing from '../components/Missing';
 import {ITEMS_PER_PAGE} from '../config';
 import {render as domRender, RenderPosition, remove} from '../utils';
 import TaskController from './TaskController';
-import Filters from '../components/Filters';
-import {getFilters} from '../mocks/filters';
 
 
 export default class BoardController {
 
-  constructor(component, filters, taskModel) {
+  constructor(component, taskModel) {
     this._tasks = [];
     this._component = component;
     this._sortComponent = new Sort();
     this._btnLoad = new Button();
     this._tasksContainer = new Tasks();
     this._missing = new Missing();
-    this._filters = filters;
     this._renderedControllers = [];
     this._taskModel = taskModel;
     this._showingTasksCount = ITEMS_PER_PAGE;
@@ -28,9 +25,10 @@ export default class BoardController {
     this._onViewChange = this._onViewChange.bind(this);
     this._onLoadMoreButtonClick = this._onLoadMoreButtonClick.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
-
+    this._onFilterChange = this._onFilterChange.bind(this);
 
     this._sortComponent.setOnClickHandler(this._onSortTypeChange);
+    this._taskModel.setFilterChangeHandler(this._onFilterChange);
   }
 
 
@@ -64,9 +62,7 @@ export default class BoardController {
     }
 
     const taskListElement = this._component.getElement().querySelector(`.board__tasks`);
-
     this._renderedControllers = this._renderTasks(taskListElement, this._tasks.slice(0, this._showingTasksCount));
-
     this._renderLoadMoreButton();
 
   }
@@ -99,11 +95,8 @@ export default class BoardController {
   }
 
 
-  _renderLoadMoreButton() {
-    
+  _renderLoadMoreButton() {  
     remove(this._btnLoad);
-
-    console.log(this._showingTasksCount);
 
     if (this._showingTasksCount >= this._taskModel.getTasks().length) {
       return;
@@ -137,7 +130,6 @@ export default class BoardController {
       if (isSuccess) {
         controller.render(newObject);
       }
-      this.updateFilters(this._tasks);
     }
   }
 
@@ -148,7 +140,7 @@ export default class BoardController {
 
   _updateTasks(count) {
     this._removeTasks();
-    this._render(this._taskModel.getTasks().slice(0, count));
+    this.renderTasks(this._taskModel.getTasks().slice(0, count));
     this._renderLoadMoreButton();
   }
 
@@ -156,10 +148,8 @@ export default class BoardController {
     this._renderedControllers.forEach((controller) => controller.setDefaultView());
   }
 
-  updateFilters(tasks) {
-    const oldFilters = this._filters.getElement();
-    this._filters = new Filters(getFilters(tasks));
-    oldFilters.replaceWith(this._filters.getElement());
+  _onFilterChange() {
+    this._updateTasks(ITEMS_PER_PAGE);
   }
 
 }

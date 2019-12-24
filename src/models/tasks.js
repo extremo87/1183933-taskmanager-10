@@ -18,6 +18,10 @@ export default class TaskModel {
     return this._tasks;
   }
 
+  getTask(id) {
+    return this._tasks.filter((it) => it.id === id);
+  }
+
   setTasks(tasks) {
     this._tasks = Array.from(tasks);
   }
