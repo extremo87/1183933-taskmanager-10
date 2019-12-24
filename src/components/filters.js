@@ -1,5 +1,11 @@
 import Component from './Component';
 
+const FILTER_ID_PREFIX = `filter__`;
+
+const getFilterNameById = (id) => {
+  return id.substring(FILTER_ID_PREFIX.length);
+};
+
 export const createFiltersTemplate = (filters) => {
 
   const renderFilter = (item, isChecked) => {
@@ -35,6 +41,13 @@ export default class Filter extends Component {
 
   getTemplate() {
     return createFiltersTemplate(this._filters);
+  }
+
+  setFilterChangeHandler(handler) {
+    this.getElement().addEventListener(`change`, (evt) => {
+      const filterName = getFilterNameById(evt.target.id);
+      handler(filterName);
+    });
   }
 
 
