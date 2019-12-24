@@ -93,11 +93,11 @@ const createRepeatingDaysMarkup = (weekDays, repeatingDays) => {
 
 const minLength = (input) => {
   return input.length >= 1;
-}
+};
 
 const maxLength = (input) => {
   return input.length <= 144;
-}
+};
 
 export const createTaskFormTemplate = (task, options = {}) => {
   const {tags, description, color} = task;
@@ -315,6 +315,12 @@ export default class Form extends SmartComponent {
         this.rerender();
       });
     }
+
+    element.querySelector(`.card__color-input`)
+      .addEventListener(`click`, () => {
+        this._isDateShowing = !this._isDateShowing;
+        this.rerender();
+      });
 
     element.querySelector(`.card__date-deadline-toggle`)
       .addEventListener(`click`, () => {
