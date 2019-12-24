@@ -1,5 +1,5 @@
-import {isToday, isExpired} from '../utils';
-import {FilterType} from '../const.js';
+import {isToday, isExpired} from './index';
+import {FilterType} from '../config/const.js';
 
 
 export const getArchiveTasks = (tasks) => {
@@ -49,6 +49,7 @@ export const getTasksByFilter = (tasks, filterType) => {
     case FilterType.TODAY:
       return getTasksInOneDay(getNotArchiveTasks(tasks), nowDate);
   }
+
 
   return tasks;
 };

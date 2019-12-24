@@ -6,8 +6,14 @@ import {getFilters} from './mocks/filters';
 import Board from './components/Board';
 import BoardController from './controllers/BoardController';
 import {render as domRender, RenderPosition} from './utils';
+import TaskModel from './models/tasks.js';
 
-const items = generateTasks(COUNT);
+const items = generateTasks(30);
+
+const model = new TaskModel();
+
+model.setTasks(items);
+
 const filters = getFilters(items);
 
 const content = document.querySelector(`.main`);
@@ -22,4 +28,4 @@ domRender(content, filtersComponent.getElement(), RenderPosition.BEFOREEND);
 const boardComponent = new Board();
 domRender(content, boardComponent.getElement(), RenderPosition.BEFOREEND);
 
-new BoardController(boardComponent, filtersComponent).render(items);
+new BoardController(boardComponent, filtersComponent, model).render(items);

@@ -1,10 +1,29 @@
 import Task from "../components/Тask";
 import Form from "../components/Form";
-import {render as domRender, RenderPosition, replace} from "../utils";
+import {render as domRender, RenderPosition, replace, remove} from "../utils";
+import {COLOR} from '../config/const';
 
 const Mode = {
   DEFAULT: `default`,
   EDIT: `edit`,
+};
+
+export const EmptyTask = {
+  description: ``,
+  dueDate: null,
+  repeatingDays: {
+    'mo': false,
+    'tu': false,
+    'we': false,
+    'th': false,
+    'fr': false,
+    'sa': false,
+    'su': false,
+  },
+  tags: [],
+  color: COLOR.BLACK,
+  isFavorite: false,
+  isArchive: false,
 };
 
 export default class TaskController {
@@ -39,15 +58,20 @@ export default class TaskController {
     this._mode = Mode.EDIT;
   }
 
-  render(task) {
+  destroy() {
+    remove(this._formComponent);
+    remove(this._taskComponent);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
 
-    const onEscKeyDown = (evt) => {
-      const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
-      if (isEscKey) {
-        this.replaceWithTask();
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      }
-    };
+  onEscKeyDown(evt) {
+    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+    if (isEscKey) {
+      this.replaceWithTask();
+    }
+  }
+
+  render(task) {
 
     const oldTaskComponent = this._taskComponent;
     const oldFormComponent = this._formComponent;
@@ -58,7 +82,7 @@ export default class TaskController {
     this._taskComponent.setEditButtonClickHandler(() => {
       this._onViewChange();
       this.replaceWithForm();
-      document.addEventListener(`keydown`, onEscKeyDown);
+      document.addEventListener(`keydown`, this.onEscKeyDown);
     });
 
     this._taskComponent.setFavouriteButtonClickHandler(() => this._onDataChange(this, task, Object.assign({}, task, {isFavorite: !task.isFavorite})));
