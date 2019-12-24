@@ -53,8 +53,6 @@ export default class BoardController {
 
     this._tasks = this._taskModel.getTasks();
 
-    console.log(this._taskModel.getTasks());
-
     const isEverythingDone = this._tasks.every((task) => task.isArchive);
 
     if (!isEverythingDone) {
@@ -80,7 +78,7 @@ export default class BoardController {
 
     switch (sortType) {
       case sortTypes().DEFAULT:
-        tasks = tasksModel.slice(0, this._showingTasksCount);
+        tasks = tasksModel.slice(0, ITEMS_PER_PAGE);
         break;
       case sortTypes().DATE_UP:
         tasks = tasksModel.slice().sort((a, b) => a.dueDate - b.dueDate);
@@ -96,13 +94,16 @@ export default class BoardController {
     if (sortType === sortTypes().DEFAULT) {
       this._renderLoadMoreButton();
     } else {
-      remove(this._loadMoreButtonComponent);
+      remove(this._btnLoad);
     }
   }
 
 
   _renderLoadMoreButton() {
+    
     remove(this._btnLoad);
+
+    console.log(this._showingTasksCount);
 
     if (this._showingTasksCount >= this._taskModel.getTasks().length) {
       return;
