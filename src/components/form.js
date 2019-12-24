@@ -4,6 +4,7 @@ import SmartComponent from './SmartComponent';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/themes/light.css';
 import {DAYS} from '../config/const';
+import he from 'he';
 
 const parseFormData = (formData) => {
   const repeatingDays = DAYS.reduce((acc, day) => {
@@ -12,11 +13,19 @@ const parseFormData = (formData) => {
   }, {});
   const date = formData.get(`date`);
 
+  const selectedDays = formData.getAll(`repeat`).reduce((acc, it) => {
+    acc[it] = true;
+    return acc;
+  }, repeatingDays);
+
+  const isRepeatedDays = Object.values(selectedDays).some(Boolean);
+
   return {
-    description: formData.get(`text`),
+    description: he.encode(formData.get(`text`)),
     color: formData.get(`color`),
     tags: formData.getAll(`hashtag`),
-    dueDate: date ? moment(date) : null,
+    dueDate: date ? date : null,
+    isRepeated: isRepeatedDays,
     repeatingDays: formData.getAll(`repeat`).reduce((acc, it) => {
       acc[it] = true;
       return acc;
@@ -82,9 +91,17 @@ const createRepeatingDaysMarkup = (weekDays, repeatingDays) => {
     .join(`\n`);
 };
 
+const minLength = (input) => {
+  return input.length >= 1;
+}
+
+const maxLength = (input) => {
+  return input.length <= 144;
+}
+
 export const createTaskFormTemplate = (task, options = {}) => {
   const {tags, description, color} = task;
-  const {isDateShowing, isRepeated, repeatingDays, dueDate} = options;
+  const {isDateShowing, isRepeated, repeatingDays, dueDate, currentDescription} = options;
   const date = dueDate instanceof Date ? moment(dueDate).format(`D MMMM h:mm a`) : false;
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
   const repeatClass = isRepeated ? `card--repeat` : ``;
@@ -95,7 +112,11 @@ export const createTaskFormTemplate = (task, options = {}) => {
     if (isRepeated && !Object.values(repeatingDays).some(Boolean)) {
       return false;
     }
+    if (!minLength(currentDescription) || !maxLength(currentDescription)) {
+      return false;
+    }
     return true;
+
 
     // TODO: date validation
 
@@ -208,6 +229,7 @@ export default class Form extends SmartComponent {
     this._formHandler = null;
     this._deleteButtonHandler = null;
     this._flatpickr = null;
+    this._currentDescription = task.description;
     this.recoveryListeners();
     this._applyFlatpickr();
   }
@@ -217,7 +239,8 @@ export default class Form extends SmartComponent {
       isDateShowing: this._isDateShowing,
       isRepeated: this._isRepeated,
       repeatingDays: this._activeRepeatingDays,
-      dueDate: this._dueDate
+      dueDate: this._dueDate,
+      currentDescription: this._currentDescription
     });
   }
 
@@ -242,8 +265,6 @@ export default class Form extends SmartComponent {
 
     return parseFormData(formData);
   }
-
-
 
   reset() {
     const task = this._task;
@@ -276,6 +297,14 @@ export default class Form extends SmartComponent {
 
   recoveryListeners() {
     const element = this.getElement();
+
+    element.querySelector(`.card__text`)
+    .addEventListener(`input`, (evt) => {
+      this._currentDescription = evt.target.value;
+
+      const saveButton = this.getElement().querySelector(`.card__save`);
+      saveButton.disabled = (!minLength(this._currentDescription) || !maxLength(this._currentDescription));
+    });
 
     element.querySelector(`.card__save`).addEventListener(`click`, this._formHandler);
 

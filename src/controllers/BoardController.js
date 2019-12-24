@@ -131,8 +131,24 @@ export default class BoardController {
   }
 
   _onDataChange(controller, oldObject, newObject) {
+    if (oldObject === EmptyTask) {
 
-    if (newObject === null) {
+      this._createForm = null;
+      if (newObject === null) {
+        controller.destroy();
+        this._updateTasks(this._showingTasksCount);
+      } else {
+        this._taskModel.addTask(newObject);
+        controller.render(newObject, TaskControllerMode.DEFAULT);
+
+        const destroyedTask = this._renderedControllers.pop();
+        destroyedTask.destroy();
+
+        this._renderedControllers = [].concat(controller, this._renderedControllers);
+
+        this._showingTasksCount = this._renderedControllers.length;
+      }
+    } else if (newObject === null) {
       this._taskModel.removeTask(oldObject.id);
       this._updateTasks(this._showingTasksCount);
     } else {
