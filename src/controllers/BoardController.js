@@ -132,7 +132,6 @@ export default class BoardController {
   }
 
   _onDataChange(controller, oldObject, newObject) {
-    console.log(controller, oldObject, newObject);
     if (oldObject === EmptyTask) {
 
       this._createForm = null;
@@ -170,9 +169,7 @@ export default class BoardController {
             this._updateTasks(this._showingTasksCount);
           }
         })
-        .catch((response) => {
-          console.log(response);
-          //taskController.shake();
+        .catch(() => {
         });
     }
   }
