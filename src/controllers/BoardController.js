@@ -9,7 +9,7 @@ import TaskController, {Mode as TaskControllerMode, EmptyTask} from './TaskContr
 
 export default class BoardController {
 
-  constructor(component, taskModel) {
+  constructor(component, taskModel, api) {
     this._tasks = [];
     this._component = component;
     this._sortComponent = new Sort();
@@ -20,6 +20,7 @@ export default class BoardController {
     this._taskModel = taskModel;
     this._showingTasksCount = ITEMS_PER_PAGE;
     this._createForm = null;
+    this._api = api;
 
     // binding context
     this._onDataChange = this._onDataChange.bind(this);
@@ -152,11 +153,19 @@ export default class BoardController {
       this._taskModel.removeTask(oldObject.id);
       this._updateTasks(this._showingTasksCount);
     } else {
-      const isSuccess = this._taskModel.updateTask(oldObject.id, newObject);
 
-      if (isSuccess) {
-        controller.render(newObject, TaskControllerMode.DEFAULT);
-      }
+      this._api.updateTask(oldObject.id, newObject)
+        .then((taskModel) => {
+          const isSuccess = this._tasksModel.updateTask(oldObject.id, taskModel);
+          if (isSuccess) {
+            controller.render(newObject, TaskControllerMode.DEFAULT);
+            this._updateTasks(this._showingTasksCount);
+          }
+        })
+        .catch((response) => {
+          console.log(response);
+          //taskController.shake();
+        });
     }
   }
 
