@@ -5,6 +5,7 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/themes/light.css';
 import {DAYS} from '../config/const';
 import he from 'he';
+import Adapter from '../models/task.js';
 
 const parseFormData = (formData) => {
   const repeatingDays = DAYS.reduce((acc, day) => {
@@ -20,17 +21,19 @@ const parseFormData = (formData) => {
 
   const isRepeatedDays = Object.values(selectedDays).some(Boolean);
 
-  return {
-    description: he.encode(formData.get(`text`)),
-    color: formData.get(`color`),
-    tags: formData.getAll(`hashtag`),
-    dueDate: date ? date : null,
-    isRepeated: isRepeatedDays,
-    repeatingDays: formData.getAll(`repeat`).reduce((acc, it) => {
+  return new Adapter({
+    'description': he.encode(formData.get(`text`)),
+    'color': formData.get(`color`),
+    'tags': formData.getAll(`hashtag`),
+    'due_date': date ? new Date(date) : null,
+    'isRepeated': isRepeatedDays,
+    'repeating_days': formData.getAll(`repeat`).reduce((acc, it) => {
       acc[it] = true;
       return acc;
     }, repeatingDays),
-  };
+    'is_favorite': false,
+    'is_done': false,
+  });
 };
 
 const renderTag = (tag) => {
@@ -223,7 +226,7 @@ export default class Form extends SmartComponent {
     super();
     this._task = task;
     this._isDateShowing = !!task.dueDate;
-    this._isRepeated = Object.values(task.repeatingDays).some(Boolean) && task.isRepeated;
+    this._isRepeated = Object.values(task.repeatingDays).some(Boolean);
     this._activeRepeatingDays = Object.assign({}, task.repeatingDays);
     this._dueDate = task.dueDate;
     this._formHandler = null;

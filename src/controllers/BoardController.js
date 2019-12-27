@@ -132,6 +132,7 @@ export default class BoardController {
   }
 
   _onDataChange(controller, oldObject, newObject) {
+    console.log(controller, oldObject, newObject);
     if (oldObject === EmptyTask) {
 
       this._createForm = null;
@@ -150,13 +151,20 @@ export default class BoardController {
         this._showingTasksCount = this._renderedControllers.length;
       }
     } else if (newObject === null) {
-      this._taskModel.removeTask(oldObject.id);
-      this._updateTasks(this._showingTasksCount);
+
+      this._api.deleteTask(oldObject.id)
+      .then(() => {
+        this._taskModel.removeTask(oldObject.id);
+        this._updateTasks(this._showingTasksCount);
+      })
+      .catch(() => {
+
+      });
     } else {
 
       this._api.updateTask(oldObject.id, newObject)
         .then((taskModel) => {
-          const isSuccess = this._tasksModel.updateTask(oldObject.id, taskModel);
+          const isSuccess = this._taskModel.updateTask(oldObject.id, taskModel);
           if (isSuccess) {
             controller.render(newObject, TaskControllerMode.DEFAULT);
             this._updateTasks(this._showingTasksCount);

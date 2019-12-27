@@ -1,5 +1,4 @@
 import Menu, {MenuItem} from './components/Menu';
-import {generateTasks} from './mocks/tasks';
 import Board from './components/Board';
 import BoardController from './controllers/BoardController';
 import {render as domRender, RenderPosition} from './utils';
