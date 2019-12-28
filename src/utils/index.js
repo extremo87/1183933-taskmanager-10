@@ -70,3 +70,10 @@ export const remove = (component) => {
   component.removeElement();
 };
 
+export const isOneDay = (dateA, dateB) => {
+  const a = moment(dateA);
+  const b = moment(dateB);
+  return a.diff(b, `days`) === 0 && dateA.getDate() === dateB.getDate();
+};
+
+
