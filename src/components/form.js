@@ -7,6 +7,11 @@ import {DAYS} from '../config/const';
 import he from 'he';
 import Adapter from '../models/task.js';
 
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  saveButtonText: `Save`,
+};
+
 const parseFormData = (formData) => {
   const repeatingDays = DAYS.reduce((acc, day) => {
     acc[day] = false;
@@ -22,6 +27,7 @@ const parseFormData = (formData) => {
   const isRepeatedDays = Object.values(selectedDays).some(Boolean);
 
   return new Adapter({
+    'id': formData.get(`task-id`),
     'description': he.encode(formData.get(`text`)),
     'color': formData.get(`color`),
     'tags': formData.getAll(`hashtag`),
@@ -103,13 +109,14 @@ const maxLength = (input) => {
 };
 
 export const createTaskFormTemplate = (task, options = {}) => {
-  const {tags, description, color} = task;
-  const {isDateShowing, isRepeated, repeatingDays, dueDate, currentDescription} = options;
+  const {tags, description, color, id} = task;
+  const {isDateShowing, isRepeated, repeatingDays, dueDate, currentDescription, externalData} = options;
   const date = dueDate instanceof Date ? moment(dueDate).format(`D MMMM h:mm a`) : false;
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
   const repeatClass = isRepeated ? `card--repeat` : ``;
   const deadlineClass = isExpired ? `card--deadline` : ``;
   const repeatingDaysMarkup = createRepeatingDaysMarkup(week, repeatingDays);
+  const {deleteButtonText, saveButtonText} = externalData;
 
   const validate = () => {
     if (isRepeated && !Object.values(repeatingDays).some(Boolean)) {
@@ -129,6 +136,7 @@ export const createTaskFormTemplate = (task, options = {}) => {
   return (`
       <article class="card card--edit card--${color} ${repeatClass} ${deadlineClass}">
       <form class="card__form" method="get">
+      <input type="hidden" name="task-id" value="${id}">
         <div class="card__inner">
           <div class="card__color-bar">
             <svg class="card__color-bar-wave" width="100%" height="10">
@@ -213,8 +221,8 @@ export const createTaskFormTemplate = (task, options = {}) => {
           </div>
   
           <div class="card__status-btns">
-            <button class="card__save" type="submit" ${(validate()) ? `` : `disabled`}>save</button>
-            <button class="card__delete" type="button">delete</button>
+            <button class="card__save" type="submit" ${(validate()) ? `` : `disabled`}>${saveButtonText}</button>
+            <button class="card__delete" type="button">${deleteButtonText}</button>
           </div>
         </div>
       </form>
@@ -235,6 +243,7 @@ export default class Form extends SmartComponent {
     this._currentDescription = task.description;
     this.recoveryListeners();
     this._applyFlatpickr();
+    this._externalData = null;
   }
 
   getTemplate() {
@@ -243,7 +252,8 @@ export default class Form extends SmartComponent {
       isRepeated: this._isRepeated,
       repeatingDays: this._activeRepeatingDays,
       dueDate: this._dueDate,
-      currentDescription: this._currentDescription
+      currentDescription: this._currentDescription,
+      externalData: DefaultData,
     });
   }
 
@@ -352,6 +362,11 @@ export default class Form extends SmartComponent {
       repeatingDays: this._activeRepeatingDays,
       dueDate: this._dueDate
     };
+  }
+
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this.rerender();
   }
 
 }

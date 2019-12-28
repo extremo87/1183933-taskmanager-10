@@ -139,15 +139,20 @@ export default class BoardController {
         controller.destroy();
         this._updateTasks(this._showingTasksCount);
       } else {
-        this._taskModel.addTask(newObject);
-        controller.render(newObject, TaskControllerMode.DEFAULT);
+        this._api.createTask(newObject)
+          .then((taskModel) => {
+            this._taskModel.addTask(taskModel);
+            controller.render(newObject, TaskControllerMode.DEFAULT);
 
-        const destroyedTask = this._renderedControllers.pop();
-        destroyedTask.destroy();
+            const destroyedTask = this._renderedControllers.pop();
+            destroyedTask.destroy();
 
-        this._renderedControllers = [].concat(controller, this._renderedControllers);
+            this._renderedControllers = [].concat(controller, this._renderedControllers);
 
-        this._showingTasksCount = this._renderedControllers.length;
+            this._showingTasksCount = this._renderedControllers.length; 
+          }).catch(() => {
+            controller.shake();
+          });
       }
     } else if (newObject === null) {
 
@@ -157,19 +162,19 @@ export default class BoardController {
         this._updateTasks(this._showingTasksCount);
       })
       .catch(() => {
-
+        controller.shake();
       });
     } else {
-
       this._api.updateTask(oldObject.id, newObject)
         .then((taskModel) => {
           const isSuccess = this._taskModel.updateTask(oldObject.id, taskModel);
           if (isSuccess) {
-            controller.render(newObject, TaskControllerMode.DEFAULT);
+            controller.render(taskModel, TaskControllerMode.DEFAULT);
             this._updateTasks(this._showingTasksCount);
           }
         })
         .catch(() => {
+          controller.shake();
         });
     }
   }
@@ -201,5 +206,6 @@ export default class BoardController {
     this._component.show();
   }
 
+ 
 }
 

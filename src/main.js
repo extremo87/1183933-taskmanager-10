@@ -29,9 +29,8 @@ filterController.render();
 const boardComponent = new Board();
 domRender(content, boardComponent.getElement(), RenderPosition.BEFOREEND);
 const board = new BoardController(boardComponent, model, api);
-
 domRender(content, statisticsComponent.getElement(), RenderPosition.BEFOREEND);
-
+statisticsComponent.hide();
 
 siteMenuComponent.setOnChange((menuItem) => {
   switch (menuItem) {

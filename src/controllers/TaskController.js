@@ -2,6 +2,7 @@ import Task from "../components/Тask";
 import Form from "../components/Form";
 import {render as domRender, RenderPosition, replace, remove} from "../utils";
 import {COLOR} from '../config/const';
+import TaskModel from '../models/task';
 
 export const Mode = {
   ADD: `add`,
@@ -26,6 +27,9 @@ export const EmptyTask = {
   isFavorite: false,
   isArchive: false,
 };
+
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 
 export default class TaskController {
   constructor(container, onDataChange, onViewChange) {
@@ -87,16 +91,34 @@ export default class TaskController {
       document.addEventListener(`keydown`, this.onEscKeyDown);
     });
 
-    this._taskComponent.setFavouriteButtonClickHandler(() => this._onDataChange(this, task, Object.assign({}, task, {isFavorite: !task.isFavorite})));
-    this._taskComponent.setArchiveButtonClickHandler(() => this._onDataChange(this, task, Object.assign({}, task, {isArchive: !task.isArchive})));
+    this._taskComponent.setFavouriteButtonClickHandler(() => {
+      const newTask = TaskModel.clone(task);
+      newTask.isFavorite = !newTask.isFavorite;
+      this._onDataChange(this, task, newTask);
+    });
+    this._taskComponent.setArchiveButtonClickHandler(() => {
+      const newTask = TaskModel.clone(task);
+      newTask.isArchive = !newTask.isArchive;
+      this._onDataChange(this, task, newTask);
+    });
     this._formComponent.setSubmitButtonHandler((evt) => {
       evt.preventDefault();
+
+      this._formComponent.setData({
+        saveButtonText: `Saving...`,
+      });
+
       const data = this._formComponent.getData();
       this._onDataChange(this, task, data);
       this.replaceWithTask();
     });
 
-    this._formComponent.setDeleteButtonHandler(() => this._onDataChange(this, task, null));
+    this._formComponent.setDeleteButtonHandler(() => {
+      this._formComponent.setData({
+        deleteButtonText: `Deleting...`,
+      });
+      this._onDataChange(this, task, null);
+    });
 
     switch (mode) {
       case Mode.DEFAULT:
@@ -119,4 +141,20 @@ export default class TaskController {
 
 
   }
+
+  shake() {
+    this._formComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._taskComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._formComponent.getElement().style.animation = ``;
+      this._taskComponent.getElement().style.animation = ``;
+
+      this._formComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
 }
