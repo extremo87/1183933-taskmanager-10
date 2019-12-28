@@ -143,13 +143,10 @@ export default class BoardController {
           .then((taskModel) => {
             this._taskModel.addTask(taskModel);
             controller.render(newObject, TaskControllerMode.DEFAULT);
-
             const destroyedTask = this._renderedControllers.pop();
             destroyedTask.destroy();
-
             this._renderedControllers = [].concat(controller, this._renderedControllers);
-
-            this._showingTasksCount = this._renderedControllers.length; 
+            this._showingTasksCount = this._renderedControllers.length;
           }).catch(() => {
             controller.shake();
           });
@@ -206,6 +203,6 @@ export default class BoardController {
     this._component.show();
   }
 
- 
+
 }
 
