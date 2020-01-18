@@ -101,6 +101,7 @@ export default class TaskController {
       newTask.isArchive = !newTask.isArchive;
       this._onDataChange(this, task, newTask);
     });
+      
     this._formComponent.setSubmitButtonHandler((evt) => {
       evt.preventDefault();
 
