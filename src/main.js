@@ -21,6 +21,14 @@ if (`serviceWorker` in navigator) {
   });
 }
 
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
+});
+
 const STORE_PREFIX = `taskmanager-localstorage`;
 const STORE_VER = `v1`;
 const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
