@@ -19,16 +19,17 @@ const parseFormData = (formData) => {
   }, {});
   const date = formData.get(`date`);
 
+  console.log(formData.get(`description`));
+
   const selectedDays = formData.getAll(`repeat`).reduce((acc, it) => {
     acc[it] = true;
     return acc;
   }, repeatingDays);
 
   const isRepeatedDays = Object.values(selectedDays).some(Boolean);
-
   return new Adapter({
     'id': formData.get(`task-id`),
-    'description': he.encode(formData.get(`text`)),
+    'description': he.encode(formData.get(`description`)),
     'color': formData.get(`color`),
     'tags': formData.getAll(`hashtag`),
     'due_date': date ? new Date(date) : null,
@@ -109,8 +110,8 @@ const maxLength = (input) => {
 };
 
 export const createTaskFormTemplate = (task, options = {}) => {
-  const {tags, description, color, id} = task;
-  const {isDateShowing, isRepeated, repeatingDays, dueDate, currentDescription, externalData} = options;
+  const {tags, color, id} = task;
+  const {isDateShowing, isRepeated, repeatingDays, dueDate, curDescription, externalData} = options;
   const date = dueDate instanceof Date ? moment(dueDate).format(`D MMMM h:mm a`) : false;
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
   const repeatClass = isRepeated ? `card--repeat` : ``;
@@ -122,16 +123,11 @@ export const createTaskFormTemplate = (task, options = {}) => {
     if (isRepeated && !Object.values(repeatingDays).some(Boolean)) {
       return false;
     }
-    if (!minLength(currentDescription) || !maxLength(currentDescription)) {
+    if (!minLength(curDescription) || !maxLength(curDescription)) {
       return false;
     }
     return true;
-
-
-    // TODO: date validation
-
   };
-
 
   return (`
       <article class="card card--edit card--${color} ${repeatClass} ${deadlineClass}">
@@ -149,8 +145,8 @@ export const createTaskFormTemplate = (task, options = {}) => {
           <textarea
             class="card__text"
             placeholder="Start typing your text here..."
-            name="text"
-          >${description}</textarea>
+            name="description"
+          >${curDescription}</textarea>
         </label>
       </div>
         
@@ -244,6 +240,7 @@ export default class Form extends SmartComponent {
     this.recoveryListeners();
     this._applyFlatpickr();
     this._externalData = null;
+    this._currentDescription = task.description;
   }
 
   getTemplate() {
@@ -254,6 +251,7 @@ export default class Form extends SmartComponent {
       dueDate: this._dueDate,
       currentDescription: this._currentDescription,
       externalData: DefaultData,
+      curDescription: this._currentDescription
     });
   }
 

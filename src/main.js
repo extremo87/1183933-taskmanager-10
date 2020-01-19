@@ -5,8 +5,10 @@ import {render as domRender, RenderPosition} from './utils';
 import TaskModel from './models/tasks.js';
 import FilterController from './controllers/FilterController';
 import {AUTHORIZATION, END_POINT} from './config';
-import API from './api.js';
+import API from './api';
 import Statistics from './components/Statistics';
+import Provider from './api/provider';
+import Store from './api/store';
 
 if (`serviceWorker` in navigator) {
   window.addEventListener(`load`, () => {
@@ -19,7 +21,12 @@ if (`serviceWorker` in navigator) {
   });
 }
 
+const STORE_PREFIX = `taskmanager-localstorage`;
+const STORE_VER = `v1`;
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 const api = new API(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 const model = new TaskModel();
 
 const dateTo = new Date();
@@ -39,7 +46,7 @@ const filterController = new FilterController(content, model);
 filterController.render();
 const boardComponent = new Board();
 domRender(content, boardComponent.getElement(), RenderPosition.BEFOREEND);
-const board = new BoardController(boardComponent, model, api);
+const board = new BoardController(boardComponent, model, apiWithProvider);
 domRender(content, statisticsComponent.getElement(), RenderPosition.BEFOREEND);
 statisticsComponent.hide();
 
@@ -63,7 +70,7 @@ siteMenuComponent.setOnChange((menuItem) => {
 });
 
 
-api.getTasks()
+apiWithProvider.getTasks()
   .then((tasks) => {
     model.setTasks(tasks);
     filterController.render();

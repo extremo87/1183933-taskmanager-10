@@ -110,6 +110,9 @@ export default class TaskController {
       });
 
       const data = this._formComponent.getData();
+
+      console.log(data);
+
       this._onDataChange(this, task, data);
       this.replaceWithTask();
     });

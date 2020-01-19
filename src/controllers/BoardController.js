@@ -132,6 +132,7 @@ export default class BoardController {
   }
 
   _onDataChange(controller, oldObject, newObject) {
+    console.log(newObject);
     if (oldObject === EmptyTask) {
 
       this._createForm = null;
