@@ -1,6 +1,7 @@
 import moment from 'moment';
 import {isExpired} from '../utils';
 import SmartComponent from './SmartComponent';
+import debounce from 'lodash/debounce';
 
 const renderTag = (tag) => {
   return (`
@@ -71,6 +72,8 @@ export const createTaskTemplate = (task) => {
       </article>`);
 };
 
+const DEBOUNCE_TIMEOUT = 2000;
+
 export default class Task extends SmartComponent {
   constructor(task) {
     super();
@@ -94,13 +97,13 @@ export default class Task extends SmartComponent {
   setFavouriteButtonClickHandler(handler) {
     this._setFavouriteButtonClickHandler = handler;
     this.getElement().querySelector(`.card__btn--favorites`)
-      .addEventListener(`click`, handler);
+      .addEventListener(`click`, debounce(handler, DEBOUNCE_TIMEOUT));
   }
 
   setArchiveButtonClickHandler(handler) {
     this._setArchiveButtonClickHandler = handler;
     this.getElement().querySelector(`.card__btn--archive`)
-      .addEventListener(`click`, handler);
+      .addEventListener(`click`, debounce(handler, DEBOUNCE_TIMEOUT));
   }
 
   recoveryListeners() {
