@@ -19,8 +19,6 @@ const parseFormData = (formData) => {
   }, {});
   const date = formData.get(`date`);
 
-  console.log(formData.get(`description`));
-
   const selectedDays = formData.getAll(`repeat`).reduce((acc, it) => {
     acc[it] = true;
     return acc;

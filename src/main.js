@@ -23,6 +23,15 @@ if (`serviceWorker` in navigator) {
 
 window.addEventListener(`online`, () => {
   document.title = document.title.replace(` [offline]`, ``);
+  if (!apiWithProvider.getSynchronize()) {
+    apiWithProvider.sync()
+      .then(() => {
+        // Действие, в случае успешной синхронизации
+      })
+      .catch(() => {
+        // Действие, в случае ошибки синхронизации
+      });
+  }
 });
 
 window.addEventListener(`offline`, () => {
@@ -76,7 +85,6 @@ siteMenuComponent.setOnChange((menuItem) => {
       break;
   }
 });
-
 
 apiWithProvider.getTasks()
   .then((tasks) => {

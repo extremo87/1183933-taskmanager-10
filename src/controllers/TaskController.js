@@ -101,18 +101,14 @@ export default class TaskController {
       newTask.isArchive = !newTask.isArchive;
       this._onDataChange(this, task, newTask);
     });
-      
+
     this._formComponent.setSubmitButtonHandler((evt) => {
       evt.preventDefault();
 
       this._formComponent.setData({
         saveButtonText: `Saving...`,
       });
-
       const data = this._formComponent.getData();
-
-      console.log(data);
-
       this._onDataChange(this, task, data);
       this.replaceWithTask();
     });
